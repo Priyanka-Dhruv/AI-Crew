@@ -12,6 +12,7 @@ def add_custom_style(image_file):
         with open(image_file, "rb") as image:
             encoded = base64.b64encode(image.read()).decode()
     except FileNotFoundError:
+        # If back.jpg is missing, we use a dark solid color fallback
         encoded = ""
 
     st.markdown(
@@ -33,7 +34,7 @@ def add_custom_style(image_file):
         .upload-header {{
             font-size: 14px !important;
             font-weight: 600;
-            color: #8fb3ff !important;
+            color: #3b82f6 !important;
             margin-bottom: 8px;
             margin-top: 15px;
         }}
@@ -54,15 +55,15 @@ def add_custom_style(image_file):
             background: linear-gradient(180deg, #1e3a5f 0%, #0a1420 100%) !important;
             color: #ffffff !important;
             border: 1px solid #2d4f7c !important;
-            padding: 12px 60px !important;
-            border-radius: 50px !important; /* Pill shape */
+            padding: 12px 600px !important; /* Wide pill button */
+            border-radius: 50px !important; 
             font-size: 16px !important;
             font-weight: 500 !important;
             box-shadow: inset 0px 1px 2px rgba(255,255,255,0.1), 0px 10px 20px rgba(0,0,0,0.4) !important;
             transition: all 0.3s ease !important;
             display: block;
             margin: 30px auto 0 auto;
-            min-width: 220px;
+            width: 100%;
         }}
 
         .stButton > button:hover {{
@@ -98,10 +99,10 @@ def add_custom_style(image_file):
     )
 
 # Execute style function
-add_custom_style("re.jpeg")
+add_custom_style("back.jpg")
 
 # ---------------------------------------------------------
-# NAVIGATION
+# NAVIGATION BAR
 # ---------------------------------------------------------
 c1, c2, c3, c4 = st.columns([2.5, 0.8, 1, 1])
 with c1: 
@@ -123,16 +124,26 @@ with left:
     st.markdown("<p style='color:#94a3b8; font-size:16px; margin-bottom:30px;'>Streamline your hiring process with deep-learning candidate matching.</p>", unsafe_allow_html=True)
     
     # JD Upload Section
-    st.markdown('<div class="upload-header">📄 Upload Job Description</div>', unsafe_allow_html=True)
-    st.file_uploader("JD", type=["pdf", "txt"], key="jd_input", label_visibility="collapsed")
+    st.markdown('<div class="upload-header">📄 Upload Job Description (PDF/TXT)</div>', unsafe_allow_html=True)
+    jd_file = st.file_uploader("JD", type=["pdf", "txt"], key="jd_input", label_visibility="collapsed")
     
-    # Resume Upload Section
-    st.markdown('<div class="upload-header">👤 Upload Candidate Resume</div>', unsafe_allow_html=True)
-    st.file_uploader("Resume", type=["pdf"], key="res_input", label_visibility="collapsed")
+    # Resume Upload Section (MODIFIED FOR MULTIPLE FILES)
+    st.markdown('<div class="upload-header">👤 Upload Candidate Resumes (Multiple PDFs)</div>', unsafe_allow_html=True)
+    resume_files = st.file_uploader(
+        "Resumes", 
+        type=["pdf"], 
+        key="res_input", 
+        label_visibility="collapsed", 
+        accept_multiple_files=True
+    )
 
-    # Primary Pill Action Button
+    # Primary Action Button
     if st.button("🚀 Start AI Analysis"):
-        st.toast("Beginning Analysis...", icon="🤖")
+        if jd_file and resume_files:
+            st.toast(f"Processing {len(resume_files)} candidates...", icon="🤖")
+            # This is where your backend processing logic will go
+        else:
+            st.warning("Please upload the Job Description and at least one Resume to proceed.")
 
 with right:
     st.markdown(
@@ -140,7 +151,7 @@ with right:
         <div class="info-card">
             <h3 style="margin-top:0; color:#3b82f6;">🔍 What Happens Next?</h3>
             <ul style="color:#cbd5e1; font-size:15px; line-height:2.2; list-style-type: none; padding-left:0;">
-                <li>🔹 Resume text extraction</li>
+                <li>🔹 Bulk resume text extraction</li>
                 <li>🔹 Skill detection & mapping</li>
                 <li>🔹 Experience relevance analysis</li>
                 <li>🔹 Match score calculation</li>
@@ -156,4 +167,4 @@ with right:
 # SIDEBAR
 # ---------------------------------------------------------
 st.sidebar.title("Dashboard")
-st.sidebar.radio("Navigate", ["Home", "Resume Analysis", "Candidate Ranking"])
+spage = st.sidebar.radio("Navigate", ["Home", "Analysis", "Candidate Ranking"])
