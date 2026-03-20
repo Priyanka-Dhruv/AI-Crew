@@ -27,7 +27,7 @@ def ranking_page():
             "Skills Missing": len([s for s in candidate["required_skills"] if s not in candidate["detected_skills"]]),
             "Location": candidate["country"],
             "Technical Skills": len(candidate["technical_skills"]),
-            "Soft Skills": len(candidate["soft_skills"])
+            "Soft Skills abcd": len(candidate["soft_skills"])
         })
     
     # Convert to DataFrame and sort by Match Score
